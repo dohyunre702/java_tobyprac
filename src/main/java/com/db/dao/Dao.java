@@ -11,8 +11,7 @@ public class Dao {
         String dbPassword = env.get("DB_PASSWORD");
 
         Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection c = DriverManager.getConnection(
-                "jdbc:mysql://localhost/likelion-db", "root", dbPassword);
+        Connection c = getConnection();
         PreparedStatement ps = c.prepareStatement(
                 "insert into users(id, name, password) values(?, ?, ?)");
         ps.setString(1, "01");
@@ -31,8 +30,7 @@ public class Dao {
         String dbPassword = env.get("DB_PASSWORD");
 
         Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection c = DriverManager.getConnection(
-                "jdbc:mysql://localhost/likelion-db", "root", dbPassword);
+        Connection c = getConnection();
 
         PreparedStatement ps = c.prepareStatement(
                 "select * from users where id = ?");
@@ -49,6 +47,12 @@ public class Dao {
         return user;
     }
 
+    //관심사의 분리
+    private Connection getConnection() throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.jdbc.Driver");
+        Connection c = DriverManager.getConnection(
+                "jdbc:mysql://localhost/aaaa", user, password);
+    }
     public static void main (String[]args) throws SQLException, ClassNotFoundException {
         Dao dao = new Dao();
         dao.add();
