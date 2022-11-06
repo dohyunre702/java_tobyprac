@@ -9,6 +9,8 @@ public class UserDao {
     private ConnectionMaker connectionMaker;
 
     public UserDao() {
+        //UserDao가 어떤 ConnectinMaker 구현 클래스의 오브젝트를 이용하게 할지 결정한다.
+        //즉, UserDao와 특정 구현 클래스 사이의 관계를 설정해 주는 것에 대한 관심사를 갖고 있다.
         connectionMaker = new DConnectionMaker();
     }
 
