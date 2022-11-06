@@ -5,7 +5,7 @@ import com.db.domain.User;
 import java.sql.*;
 import java.util.Map;
 
-public class Dao {
+public abstract class Dao {
     public void add() throws ClassNotFoundException, SQLException {
         Map<String, String> env = System.getenv();
         String dbPassword = env.get("DB_PASSWORD");
@@ -47,14 +47,11 @@ public class Dao {
         return user;
     }
 
-    //관심사의 분리
-    private Connection getConnection() throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection c = DriverManager.getConnection(
-                "jdbc:mysql://localhost/aaaa", user, password);
-    }
+    //추상 메소드로 변형하기
+    public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
+
     public static void main (String[]args) throws SQLException, ClassNotFoundException {
-        Dao dao = new Dao();
+        Dao dao = new Dao(); //error
         dao.add();
     }
 }
