@@ -1,23 +1,15 @@
-package com.db.dao;
+package reference;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Map;
 
-public class Dao02 {
-    private Connection getConnection() throws ClassNotFoundException, SQLException {
-        Map<String, String> env = System.getenv();
-        String dbPassword = env.get("DB_PASSWORD");
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection c = DriverManager.getConnection(
-                "jdbc:mysql://localhost/likelion-db", "root", dbPassword);
-        return c;
-    }
+public class Dao04 {
+    SimpleConnectionMaker scm = new SimpleConnectionMaker();
+
     public void add() throws ClassNotFoundException, SQLException {
 
-        Connection c = getConnection();
+        Connection c = scm.getConnection();
 
         PreparedStatement ps = c.prepareStatement(
                 "insert into users(id, name, password) values(?, ?, ?)");
@@ -33,7 +25,7 @@ public class Dao02 {
     }
 
     public static void main (String[]args) throws SQLException, ClassNotFoundException {
-        Dao02 dao = new Dao02();
+        Dao04 dao = new Dao04();
         dao.add();
     }
 }

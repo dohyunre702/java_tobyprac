@@ -1,9 +1,7 @@
 package com.db;
 
-import com.db.dao.UserDao05WithInterface;
-import com.db.dao.UserDaoFactory;
-import com.db.dao.UserDaoFactory2;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import reference.UserDao05WithInterface;
+import reference.UserDaoFactory;
 
 import java.sql.SQLException;
 

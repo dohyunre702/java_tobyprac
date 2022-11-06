@@ -1,12 +1,8 @@
-package com.db.dao;
+package reference;
 
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.Map;
 
 @Configuration
 public class UserDaoFactory2 {

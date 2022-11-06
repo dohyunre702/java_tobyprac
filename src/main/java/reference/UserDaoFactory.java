@@ -1,4 +1,4 @@
-package com.db.dao;
+package reference;
 
 public class UserDaoFactory {
 

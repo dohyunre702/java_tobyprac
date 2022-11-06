@@ -1,4 +1,4 @@
-package com.db.dao;
+package reference;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,12 +6,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class Dao04 {
-    SimpleConnectionMaker scm = new SimpleConnectionMaker();
+public abstract class UserDao03Abstract {
+
+    public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
 
     public void add() throws ClassNotFoundException, SQLException {
 
-        Connection c = scm.getConnection();
+        Connection c = getConnection();
 
         PreparedStatement ps = c.prepareStatement(
                 "insert into users(id, name, password) values(?, ?, ?)");
@@ -27,7 +28,5 @@ public class Dao04 {
     }
 
     public static void main (String[]args) throws SQLException, ClassNotFoundException {
-        Dao04 dao = new Dao04();
-        dao.add();
     }
 }
