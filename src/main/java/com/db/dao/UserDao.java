@@ -6,10 +6,10 @@ import java.sql.*;
 import java.util.Map;
 
 public class UserDao {
-    private ConnectionMaker connectionMaker;
+    private DConnectionMaker DConnectionMaker;
 
     public UserDao() {
-        connectionMaker = new ConnectionMaker();
+        DConnectionMaker = new DConnectionMaker();
     }
 
     public void add() throws ClassNotFoundException, SQLException {
@@ -17,7 +17,7 @@ public class UserDao {
         String dbPassword = env.get("DB_PASSWORD");
 
         Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection c = connectionMaker.getConnection();
+        Connection c = DConnectionMaker.getConnection();
         PreparedStatement ps = c.prepareStatement(
                 "insert into users(id, name, password) values(?, ?, ?)");
         ps.setString(1, "01");
@@ -36,7 +36,7 @@ public class UserDao {
         String dbPassword = env.get("DB_PASSWORD");
 
         Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection c = connectionMaker.getConnection();
+        Connection c = DConnectionMaker.getConnection();
 
         PreparedStatement ps = c.prepareStatement(
                 "select * from users where id = ?");

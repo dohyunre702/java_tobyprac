@@ -1,14 +1,10 @@
 package com.db.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class ConnectionMaker {
-    public Connection getConnection() throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection c = DriverManager.getConnection(
-                "jdbc:mysql://localhost/aaaa", user, password);
-        return c;
-    }
+//DAO 확장을 위한 인터페이스 도입
+public interface ConnectionMaker {
+    public Connection makeConnection() throws ClassNotFoundException,
+            SQLException;
 }

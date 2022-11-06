@@ -1,177 +1,32 @@
-# Pojo JAVA DB연동
+# 스프링 복습
 
-## Code
+## 11.06 오브젝트와 의존관계
 
-User.java
+### 1. 복습 범위
+1. 관심사의 분리
+2. 커넥션 만들기의 추출 : 중복 코드의 메소드 추출, 추상 클래스와 상속을 통한 독립 및 확장
+3. 클래스의 분리
+4. DAO의 확장 - 인터페이스의 도입
 
-```java
-public class User {
-    private String id;
-    private String name;
-    private String password;
-
-    public User(String id, String name, String password) {
-        this.id = id;
-        this.name = name;
-        this.password = password;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-}
-```
-
-UserDao.java
-
-```java
-import java.sql.*;
-import java.util.Map;
-
-public class UserDao {
-    public void add(User user) {
-        Map<String, String> env = System.getenv();
-        try {
-            // DB접속 (ex sql workbeanch실행)
-            Connection c = DriverManager.getConnection(env.get("DB_HOST"),
-                    env.get("DB_USER"), env.get("DB_PASSWORD"));
-
-            // Query문 작성
-            PreparedStatement pstmt = c.prepareStatement("INSERT INTO users(id, name, password) VALUES(?,?,?);");
-            pstmt.setString(1, user.getId());
-            pstmt.setString(2, user.getName());
-            pstmt.setString(3, user.getPassword());
-
-            // Query문 실행
-            pstmt.executeUpdate();
-
-            pstmt.close();
-            c.close();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
-    public User findById(String id) {
-        Map<String, String> env = System.getenv();
-        Connection c;
-        try {
-            // DB접속 (ex sql workbeanch실행)
-             c = DriverManager.getConnection(env.get("DB_HOST"),
-                    env.get("DB_USER"), env.get("DB_PASSWORD"));
-
-            // Query문 작성
-            PreparedStatement pstmt = c.prepareStatement("SELECT * FROM users WHERE id = ?");
-            pstmt.setString(1, id);
-
-            // Query문 실행
-            ResultSet rs = pstmt.executeQuery();
-            rs.next();
-            User user = new User(rs.getString("id"), rs.getString("name"),
-                    rs.getString("password"));
-
-            rs.close();
-            pstmt.close();
-            c.close();
-
-            return user;
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void main(String[] args) {
-        UserDao userDao = new UserDao();
-//        userDao.add();
-        User user = userDao.findById("6");
-        System.out.println(user.getName());
-    }
-}
-```
-
-### Spring Boot dependency추가
-
-spring-boot-starter-jdbc
-
-spring-boot-starter-test
-
-```java
-dependencies {
-    implementation 'mysql:mysql-connector-java:8.0.30'
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc:2.7.4'
-    implementation 'org.springframework.boot:spring-boot-starter-test:2.7.4'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-}
-```
-
-## Factory를 Bean으로
-
-```java
-@Configuration
-public class UserDaoFactory2 {
-
-    @Bean
-    public UserDao05Interface userDao05Interface() {
-        return new UserDao05Interface(() -> {
-            return null;
-        });
-    }
-
-}
-
-public class Main {
-    public static void main(String[] args) {
-        AnnotationConfigApplicationContext ctx =
-                new AnnotationConfigApplicationContext(UserDaoFactory2.class);
-        UserDao05Interface userDao = ctx.getBean("userDao05Interface", UserDao05Interface.class);
-
-    }
-}
-```
-
-### Test에서 Factory의 Configuration사용
-```java
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = UserDaoFactory2.class)
-public class UserDao05WithInterfaceTest {
-
-    @Autowired
-    ApplicationContext context;
-
-    @Test
-    public void testName() throws SQLException, ClassNotFoundException {
-        UserDao05WithInterface userDao = context.getBean("userDao", UserDao05WithInterface.class);
-        userDao.add();
-    }
-}
-```
-
-### StatementStrategy Interface
-
-StatementStrategy Interface를 적용하면 아래와 같이 반복되는 부분을 한단계 추상화 할 수 있습니다.
-
-```java
-PreparedStatement pstmt = conn.prepareStatement("delete from users");
-```
-
-```java
-public interface StatementStrategy {
-    PreparedStatement makePreparedStatement(Connection c);
-}
-```
+### 2. 다시 이해한 부분
+1. JDBC를 이용하는 작업의 일반적 순서 = 템플릿 메소드 패턴
+    - DB 연결을 위한 커넥션 가져오기
+    - SQL Statement 만들기
+    - Statement 실행
+    - 반환
+      - 조회: 쿼리 실행 결과를 ResultSet에 받아 정보를 저장할 오브젝트(User)에 옮김
+      - 작업 중 생성된 리소스는 작업을 마친 후 꼭 닫아주기
+    - 예외처리
+2. 자바빈 규약
+3. 관심사의 분리
+   - 메소드 하나에서 서로 다른 관심사를 다른 메소드/클래스로 분리하는 것
+   - 이유: 코드의 중복 방지. 변화에 유연한 코드 만들기
+   - 여기에서는 DB 커넥션을 분리해 줌
+4. DAO의 확장
+   - 클래스의 분리에도 자유로운 확장이 가능하게 하려면, 인터페이스를 통해 추상화를 거쳐야 함
+   - UserDao는 Connection 오브젝트가 만들어지는 방법, 내부 동작 방식에 상관없이 필요한 기능을 Connection 인터페이스를 통해 사용하기만 하면 된다.
+   - 
 
 
-### 참고 
-https://github.com/Kyeongrok/toby_spring
-
+### 느낀 점, 모르겠는 것
+아직은 없다.
